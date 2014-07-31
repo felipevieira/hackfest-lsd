@@ -10,8 +10,15 @@
     <script type="text/javascript"
       src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDFBRMj_R_eCBebGLSFuKviKayRSod8XFE&sensor=SET_TO_TRUE_OR_FALSE">
     </script>
+    <script type="text/javascript"
+      src="http://code.jquery.com/jquery-2.1.1.min.js">
+    </script>
     <script type="text/javascript">
-      function initialize() {
+      var clicks = 0;
+      var from;
+      var to;
+
+      $( document ).ready(function() {
         var mapOptions = {
           center: new google.maps.LatLng(-34.397, 150.644),
           zoom: 5,
@@ -29,10 +36,58 @@
                 alert("Could not find location: " + location);
             }
         });
-      }
+
+        google.maps.event.addListener(map, 'click', function(event) {
+          if (clicks==0) {
+            from = event.latLng;
+          }
+
+          else if (clicks==1) {
+            to = event.latLng;
+          }
+
+          clicks++;
+
+          if (clicks==2) {
+            var coordinates = [from, to];
+            var points = getPointsInBetween(coordinates[0], coordinates[1]);
+
+            var flightPlanCoordinates = [
+            points[0],
+            points[1],
+            points[2],
+          ];
+
+          var flightPath = new google.maps.Polyline({
+            path: flightPlanCoordinates,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+          });
+
+          flightPath.setMap(map);
+          }
+        });
+
+        function getPointsInBetween(startPoint, endPoint, howManyPointsInBetween){
+         midPoint = getPointInBetween(startPoint, endPoint)
+         var coords = [
+           startPoint, midPoint, endPoint
+         ];
+         return coords
+        }
+
+        function getPointInBetween(startPoint, endPoint){
+          midLat = (startPoint.lat()+endPoint.lat())/2
+          midLng = (startPoint.lng()+endPoint.lng())/2
+          return new google.maps.LatLng(midLat, midLng)
+        }
+        
+      });
     </script>
   </head>
-  <body onload="initialize()">
+  <body>
     <div id="map_canvas" style="width:100%; height:100%"></div>
   </body>
 </html>
