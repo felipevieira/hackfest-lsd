@@ -13,6 +13,7 @@
     <script type="text/javascript"
       src="http://code.jquery.com/jquery-2.1.1.min.js">
     </script>
+    <script type="text/javascript" src = "js/viaji.js"></script>
     <script type="text/javascript">
       var clicks = 0;
       var from;
@@ -50,7 +51,7 @@
 
           if (clicks==2) {
             var coordinates = [from, to];
-            var points = getPointsInBetween(coordinates[0], coordinates[1]);
+            points = getPointsInBetween(coordinates[0], coordinates[1]);
 
             var flightPlanCoordinates = [
             points[0],
@@ -67,6 +68,24 @@
           });
 
           flightPath.setMap(map);
+
+	  getTracks(points[0].k, points[0].B, 1, "pop", function(tracks, ids) {
+			console.log("Inicial");
+			console.log(tracks);
+		}); 	
+          
+
+
+	  getTracks(points[1].k, points[1].B, 1, "pop", function(tracks, ids) {
+			console.log("Meio");
+			console.log(tracks);
+		}); 	
+          
+
+	  getTracks(points[2].k, points[2].B, 1, "pop", function(tracks, ids) {
+			console.log("Fim");
+			console.log(tracks);
+		}); 	
           }
         });
 
@@ -88,6 +107,15 @@
     </script>
   </head>
   <body>
-    <div id="map_canvas" style="width:100%; height:100%"></div>
+	<div class="container">
+		<div class="row">
+		  <div class="col-md-8">
+			<div id="map_canvas" style="height:500px; width: 500px"></div>	
+		  </div>
+		  <div class="col-md-4">
+			<h2 class="featurette-heading">Tracks <span class="muted">It'll blow your mind.</span></h2>
+		  </div>
+		</div>
+	</div>
   </body>
 </html>
