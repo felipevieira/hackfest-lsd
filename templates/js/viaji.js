@@ -26,7 +26,12 @@ console.log(request_url);
 		//$.each(selected_tracks, function(i, item) {
 		//	console.log(item);		
 		//});
-		console.log("Got " + track_ids.length + " songs");
+
+		if(track_ids.length > 0) {
+			track = track_ids[0];
+			$("#playlist").attr("src",$("#playlist").attr("src") + track.split(":")[2] +",");
+		} 
+		
 		callback(selected_tracks, track_ids);
         }
   });  
