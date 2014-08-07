@@ -43,20 +43,14 @@ $( document ).ready(function() {
 
             flightPath.setMap(map);
 
-            getTracks(points[0].k, points[0].B, 1, "pop", function(tracks, ids) {
-                console.log("Inicial");
-                console.log(tracks);
-            }); 	
-
-            getTracks(points[1].k, points[1].B, 1, "pop", function(tracks, ids) {
-                console.log("Meio");
-                console.log(tracks);
-            }); 	
-
-            getTracks(points[2].k, points[2].B, 1, "pop", function(tracks, ids) {
-                console.log("Fim");
-                console.log(tracks);
-            }); 	
+            var point;
+            for (count=0; count<flightPlanCoordinates.length;count++){
+                point = flightPlanCoordinates[count];
+                getTracks(point.lat(), point.lng(), 1, "pop", function(tracks, ids) {
+                    console.log("Point " + count);
+                    console.log(tracks);
+                });
+            }
         }
     });
 
