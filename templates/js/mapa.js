@@ -1,8 +1,13 @@
+var RADIUS_AROUND_POINTS = 2;
+var DEFAULT_TRIP_STOPS = 4;
+
 var clicks = 0;
 var from;
 var to;
 
-var RADIUS = 2;
+var currentPlaylist = [];
+var flightPlanCoordinates;
+var explanations = [];
 
 $(document).ready(function() {
 	// if (navigator.geolocation) {
@@ -17,7 +22,7 @@ $(document).ready(function() {
 
 	var mapOptions = {
 		center : new google.maps.LatLng(-34.397, 150.644),
-		zoom : 5,
+		zoom : 3,
 		mapTypeId : google.maps.MapTypeId.ROADMAP
 	};
 	var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
@@ -45,7 +50,12 @@ $(document).ready(function() {
 		clicks++;
 
 		if (clicks == 2) {
-			var flightPlanCoordinates = getPointsInBetween(from, to, 4);
+			var travelTheme = $('#tripstyle').val();
+			if (travelTheme == "") {
+				travelTheme = "pop";
+			}
+
+			flightPlanCoordinates = getPointsInBetween(from, to, DEFAULT_TRIP_STOPS);
 
 			var flightPath = new google.maps.Polyline({
 				path : flightPlanCoordinates,
@@ -58,7 +68,8 @@ $(document).ready(function() {
 			flightPath.setMap(map);
 
 			// draw points
-			for ( count = 1; count < flightPlanCoordinates.length -1; count++) {
+			var count = 0;
+			for ( count = 1; count < flightPlanCoordinates.length - 1; count++) {
 				var point = flightPlanCoordinates[count];
 				drawPoint(point, map);
 			}
@@ -66,23 +77,77 @@ $(document).ready(function() {
 			// get tracks
 			for ( count = 0; count < flightPlanCoordinates.length; count++) {
 				var point = flightPlanCoordinates[count];
-				getTracks(point.lat(), point.lng(), 1, "pop", function(tracks, ids) {
-					console.log("Point " + count);
-					console.log(tracks);
+				getTracks(point, RADIUS_AROUND_POINTS, travelTheme, function(pointUsed, tracks, ids) {
+					var chosen = chooseTracksFromSample(tracks, ids);
+					var track_index = flightPlanCoordinates.indexOf(pointUsed);
+					currentPlaylist[track_index] = chosen;
+					explanations[track_index] = buildTextualDetails(pointUsed, tracks, ids, chosen);
+					if (currentPlaylist.length == DEFAULT_TRIP_STOPS + 2) {
+						setupPlayer();
+						updateDetails();
+					}
 				});
 			}
 		}
 	});
 
+	function buildTextualDetails(point, tracks, ids, chosen_id) {
+		var explanation_index = flightPlanCoordinates.indexOf(point);
+		if (chosen_id == null) {
+			return "<span class=\"text-muted\"> Point " + (explanation_index + 1) + ": we couldn't find music in the theme around </span> " + point;
+		} else {
+			var artists = [];
+			$.each(tracks, function(i, v) {
+				var toadd = " ";
+				if (i == tracks.length - 1)
+					toadd += "or ";
+				artists.push(toadd + v.split(" -")[0]);
+			});
+			var chosen_track = tracks[ids.indexOf(chosen_id)];
+			return "<span class=\"text-muted\">Point " + (explanation_index + 1) + ": around </span> " + point + "<span class=\"text-muted\"> we thought of </span>" + artists + "<span class=\"text-muted\">. We chose </span>" + chosen_track;
+		}
+	}
+
+	function updateDetails() {
+		$("#choice_details").empty();
+		$.each(explanations, function(i, v) {
+			var toadd = "<li class=\"list-group-item\">" + v + "</li>";
+			$("#choice_details").append(toadd);
+		});
+	}
+
+	/**
+	 * @param tracks List of names of tracks, X for the point in the trip.
+	 * @param ids in spotify namespace
+	 */
+	function chooseTracksFromSample(tracks, ids) {
+		var count;
+		for ( count = 0; count < ids.length; count++) {
+			if (currentPlaylist.indexOf(ids[count]) == -1) {
+				return ids[count];
+			}
+		}
+		return null;
+	}
+
+	function setupPlayer() {
+		$.each(currentPlaylist, function(i, v) {
+			if (v != null) {
+				$("#playlist").attr("src", $("#playlist").attr("src") + v.split(":")[2] + ",");
+			}
+		});
+		fadeToPlaylist();
+	}
+
 	function drawMarker(thePosition, theMap) {
-		return new google.maps.Marker({
+		new google.maps.Marker({
 			position : thePosition,
 			map : theMap
 		});
 	}
 
 	function drawPoint(thePosition, theMap) {
-		return new google.maps.Circle({
+		new google.maps.Circle({
 			center : thePosition,
 			radius : 40000.0,
 			strokeColor : '#FF3300',
@@ -111,17 +176,17 @@ $(document).ready(function() {
 
 	function getIncrementSize(start, end, size) {
 		if (start >= end) {
-			return (start - end) / (size + 1)
+			return (start - end) / (size + 1);
 		} else {
-			return (end - start) / (size + 1)
+			return (end - start) / (size + 1);
 		}
 	}
 
 	function getIncrement(start, end, increment) {
 		if (start >= end) {
-			return start - increment
+			return start - increment;
 		} else {
-			return start + increment
+			return start + increment;
 		}
 	}
 
