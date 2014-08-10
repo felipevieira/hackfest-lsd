@@ -1,34 +1,67 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <style type="text/css">
-      html { height: 100% }
-      body { height: 100%; margin: 0; padding: 0 }
-      #map_canvas { height: 100% }
-    </style>
-    <script type="text/javascript"
-      src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDFBRMj_R_eCBebGLSFuKviKayRSod8XFE&sensor=SET_TO_TRUE_OR_FALSE">
-    </script>
-    <script type="text/javascript"
-      src="http://code.jquery.com/jquery-2.1.1.min.js">
-    </script>
-    <script type="text/javascript" src = "js/viaji.js"></script>
-    <script type="text/javascript" src = "js/mapa.js"></script>
-  </head>
-  <body>
-  <div id="map_canvas" style="height:500px"></div>
-	<div class="container">
-		<div class="row">
-		  <div class="col-md-8">
-				
-		  </div>
-		  <div class="col-md-4">
-			<h2 class="featurette-heading">Tracks <span class="muted">It'll blow your mind.</span></h2>
-      <a href=> </a>
-      <iframe id="playlist" src="https://embed.spotify.com/?uri=spotify:trackset:Que viaji:" width="300" height="400" frameborder="0" allowtransparency="true"></iframe>
-		  </div>
+	<head>
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+		<meta charset="utf-8">
+		<link href="css/bootstrap.css" rel="stylesheet">
+		<script type="text/javascript"
+		src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDFBRMj_R_eCBebGLSFuKviKayRSod8XFE&sensor=SET_TO_TRUE_OR_FALSE"></script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src = "js/viaji.js"></script>
+		<script type="text/javascript" src = "js/mapa.js"></script>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<br />
+				<br />
+				<div class="col-md-1">
+					<h4 class="featurette-heading text-muted">a theme</h4>
+				</div>
+				<div class="col-md-6">
+					<div class="row">
+						<h4 class="featurette-heading">Any theme for the trip?</h4>
+					</div>
+					<br />
+					<div class="row">
+						<input id="tripstyle" type="text" class="form-control" placeholder="eg: Rock, Lambada, Psychedelic carimbó...">
+						<br>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<br />
+				<br />
+				<br />
+				<div class="col-md-1">
+					<h4 class="featurette-heading text-muted">the route</h4>
+				</div>
+				<div class="col-md-6">
+					<div class="row">
+						<h4 class="featurette-heading">Ok. Now choose start and end points</h4>
+					</div>
+					<div class="row">
+						<br>
+						<div id="map_canvas" style="height:400px"></div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<br>
+				<br />
+				<br />
+				<br />
+				<div class="col-md-1">
+					<h4 class="featurette-heading text-muted">the music</h4>
+				</div>
+				<div class="col-md-6">
+					<h4 class="featurette-heading">Done. Just relax and enjoy the cruise</h4>
+					<br />
+					<a href=> </a>
+					<iframe id="playlist" src="https://embed.spotify.com/?uri=spotify:trackset:Que viaji:" width="300" height="400" frameborder="0" allowtransparency="true"></iframe>
+				</div>
+			</div>
 		</div>
-	</div>
-  </body>
+	</body>
 </html>
