@@ -36,6 +36,12 @@
 	<body>
 		<div class="container">
 			<div class="row">
+				<img src="img/logo.jpeg" />
+			</div>
+			<div class="row">
+				<br />
+				<br />
+				<br />
 				<br />
 				<br />
 				<div class="col-md-1">
@@ -72,6 +78,7 @@
 				<div class="col-md-7">
 					<div class="row">
 						<h4 class="featurette-heading">Ok. Now choose start and end points</h4>
+						<span id="tracks-status" class="text-muted"></span>
 					</div>
 					<div class="row">
 						<br>
@@ -88,15 +95,19 @@
 					<h4 class="featurette-heading text-muted">the music</h4>
 				</div>
 				<div id="playlistdiv" class="col-md-6">
-					<h4 class="featurette-heading">Done. Just relax and enjoy the cruise</h4>
+					<h4 class="featurette-heading">Done. Time to relax and enjoy the cruise</h4>
+					<span id="player-status" class="text-muted"></span>
 					<br />
-					<iframe id="playlist" src="https://embed.spotify.com/?uri=spotify:trackset:Que viaji:" width="300" height="400" frameborder="0" allowtransparency="true"></iframe>
+					<br />
+					<iframe id="playlist" src="https://embed.spotify.com/?uri=spotify:trackset:Que viaji:" width="400" height="400" frameborder="0" allowtransparency="true"></iframe>
 					<br />
 					<span class="text-muted">you can also check out <a href="#detailsrow">how the playlist was chosen</a> or <a href="index.html">start over</a>.</span>
 				</div>
 			</div>
 
 			<div id="detailsrow" class="row">
+				<br />
+				<br />
 				<br />
 				<br />
 				<div class="col-md-1">
@@ -110,7 +121,7 @@
 					</ul>
 				</div>
 			</div>
-			
+
 			<script>
 				(function(i, s, o, g, r, a, m) {
 					i['GoogleAnalyticsObject'] = r;
@@ -122,7 +133,7 @@
 					a.async = 1;
 					a.src = g;
 					m.parentNode.insertBefore(a, m)
-				})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+				})(window, document, 'script', 'http://www.google-analytics.com/analytics.js', 'ga');
 
 				ga('create', 'UA-53682895-1', 'auto');
 				ga('send', 'pageview');

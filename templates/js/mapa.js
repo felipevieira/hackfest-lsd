@@ -8,6 +8,7 @@ var to;
 var currentPlaylist = [];
 var flightPlanCoordinates;
 var explanations = [];
+var knownAnswers = 0;
 
 $(document).ready(function() {
 	// if (navigator.geolocation) {
@@ -75,14 +76,18 @@ $(document).ready(function() {
 			}
 
 			// get tracks
+			$("#tracks-status").text("fetching music");
 			for ( count = 0; count < flightPlanCoordinates.length; count++) {
 				var point = flightPlanCoordinates[count];
+				var totalTripStops = DEFAULT_TRIP_STOPS + 2;
 				getTracks(point, RADIUS_AROUND_POINTS, travelTheme, function(pointUsed, tracks, ids) {
 					var chosen = chooseTracksFromSample(tracks, ids);
 					var track_index = flightPlanCoordinates.indexOf(pointUsed);
 					currentPlaylist[track_index] = chosen;
 					explanations[track_index] = buildTextualDetails(pointUsed, tracks, ids, chosen);
-					if (currentPlaylist.length == DEFAULT_TRIP_STOPS + 2) {
+					knownAnswers++;
+					$("#tracks-status").text("got songs for " + knownAnswers + " of the " + totalTripStops + " stops in your trip");
+					if (knownAnswers == totalTripStops) {
 						setupPlayer();
 						updateDetails();
 					}
@@ -131,11 +136,16 @@ $(document).ready(function() {
 	}
 
 	function setupPlayer() {
+		var missedPoints = 0;
 		$.each(currentPlaylist, function(i, v) {
 			if (v != null) {
 				$("#playlist").attr("src", $("#playlist").attr("src") + v.split(":")[2] + ",");
+			} else {
+				missedPoints++;
 			}
 		});
+		if (missedPoints > 0)
+			$("#player-status").text("(we couldn't find songs for " + missedPoints + " out of the " + knownAnswers + " points in the trip)");
 		fadeToPlaylist();
 	}
 
