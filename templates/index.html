@@ -6,32 +6,11 @@
 		<link href="css/bootstrap.css" rel="stylesheet">
 		<script type="text/javascript"
 		src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDFBRMj_R_eCBebGLSFuKviKayRSod8XFE&sensor=SET_TO_TRUE_OR_FALSE"></script>
-		<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="vendor/jquery-2.1.1.min.js"></script>
 		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src = "js/viaji.js"></script>
 		<script type="text/javascript" src = "js/mapa.js"></script>
-		<script>
-			$(function() {
-				$('a[href*=#]:not([href=#])').click(function() {
-					if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') && location.hostname == this.hostname) {
-
-						var target = $(this.hash);
-						target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
-						if (target.length) {
-							$('html,body').animate({
-								scrollTop : target.offset().top
-							}, 1000);
-							return false;
-						}
-					}
-				});
-			});
-
-			$(document).ready(function() {
-				$("#route").fadeTo("slow", 0.33);
-				$("#playlistdiv").fadeTo("slow", 0.33);
-			});
-		</script>
+		<script src="//www.parsecdn.com/js/parse-1.2.19.min.js"></script>
 	</head>
 	<body>
 		<div class="container">
@@ -39,7 +18,6 @@
 				<img src="img/logo.jpeg" />
 			</div>
 			<div class="row">
-				<br />
 				<br />
 				<br />
 				<div class="col-md-1">
@@ -52,7 +30,7 @@
 					<div class="row">
 						<br>
 						<div class="input-group">
-							<input id="tripstyle" class="form-control" placeholder="eg: Rock, Lambada, Psychedelic carimbó..." type="text">
+							<input id="tripstyle" class="form-control" placeholder="eg: funk, samba, cha-cha-cha, ..." type="text">
 							<span class="input-group-btn"> <a href="#route">
 								<button class="btn btn-default" type="button" onclick="fadeToMap()" >
 									go
@@ -60,9 +38,6 @@
 							</a>
 							<!-- <span class="input-group-addon">set</span> -->
 						</div>
-						<p class="help-block">
-							no ideas? try "pop" or "rock"
-						</p>
 					</div>
 				</div>
 			</div>

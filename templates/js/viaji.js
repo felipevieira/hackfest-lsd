@@ -1,3 +1,10 @@
+/**
+ * The function to get data tracks from Echonest based on latitude, longitude and buffer size.
+ * @param {Object} point
+ * @param {Object} radius
+ * @param {Object} genre
+ * @param {Object} callback
+ */
 function getTracks(point, radius, genre, callback) {
 	var lat = point.lat();
 	var lng = point.lng();
@@ -32,22 +39,45 @@ function getTracks(point, radius, genre, callback) {
 	});
 }
 
-function fadeToMap(){
+function fadeToMap() {
 	$("#route").fadeTo("slow", 1);
 }
 
-function fadeToPlaylist(){
+function fadeToPlaylist() {
 	goToByScroll("#playlistdiv");
 	$("#playlistdiv").fadeTo("slow", 1);
 }
 
-
-function goToByScroll(id){
-      // Scroll
-    $('html,body').animate({
-        scrollTop: $(id).offset().top},
-        'slow');
+function goToByScroll(id) {
+	// Scroll
+	$('html,body').animate({
+		scrollTop : $(id).offset().top
+	}, 'slow');
 }
 
 // radius = 2 eh o suficiente pra incluir ateh patos com CG como centro
 //getTracks(-7, -35, 2, "forró" , function(names, ids) {console.log(names); console.log(ids)});
+
+/**
+ * Fancy scrolling.
+ */
+$(function() {
+	$('a[href*=#]:not([href=#])').click(function() {
+		if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') && location.hostname == this.hostname) {
+
+			var target = $(this.hash);
+			target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
+			if (target.length) {
+				$('html,body').animate({
+					scrollTop : target.offset().top
+				}, 1000);
+				return false;
+			}
+		}
+	});
+});
+
+$(document).ready(function() {
+	$("#route").fadeTo("slow", 0.33);
+	$("#playlistdiv").fadeTo("slow", 0.33);
+});

@@ -7,6 +7,7 @@ var to;
 
 var currentPlaylist = [];
 var flightPlanCoordinates;
+var flightPlanNames;
 var explanations = [];
 var knownAnswers = 0;
 
@@ -119,6 +120,7 @@ $(document).ready(function() {
 			var toadd = "<li class=\"list-group-item\">" + v + "</li>";
 			$("#choice_details").append(toadd);
 		});
+		createNamesForCoordinates(flightPlanCoordinates);
 	}
 
 	/**
@@ -152,6 +154,7 @@ $(document).ready(function() {
 	function drawMarker(thePosition, theMap) {
 		new google.maps.Marker({
 			position : thePosition,
+			animation : google.maps.Animation.DROP,
 			map : theMap
 		});
 	}
@@ -200,4 +203,32 @@ $(document).ready(function() {
 		}
 	}
 
+	function createNamesForCoordinates(flightCoordinates) {
+		flightPlanNames = [];
+		$.each(flightCoordinates, function(i, v) {
+			window.setTimeout(function() {
+				codeLatLng(v.k, v.A, flightPlanNames, i);
+			}, 1200);
+		});
+	}
+
+	function codeLatLng(lat, lng, namesArray, i) {
+		var latlng = new google.maps.LatLng(lat, lng);
+		geocoder.geocode({
+			'latLng' : latlng
+		}, function(results, status) {
+			if (status == google.maps.GeocoderStatus.OK) {
+				console.log(results)
+				if (results[3]) {
+					namesArray[i] = results[3];
+				} else {
+					console.log("No results found in reverse geocoding");
+				}
+			} else {
+				console.log("Geocoder failed due to: " + status);
+			}
+		});
+	}
+
 });
+

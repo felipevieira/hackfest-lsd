@@ -1,4 +1,4 @@
-hackfest-lsd
+Hackfests lsd + música
 ============
 
-Projeto desenvolvido no Hackfest de Computação e Música do LSD
+Projetos desenvolvidos nos Hackfests de Computação e Música do Laboratório de Sistemas Distribuídos da UFCG.
