@@ -1,104 +1,101 @@
-var RADIUS_AROUND_POINTS = 2;
-var DEFAULT_TRIP_STOPS = 4;
+viaji = {
 
-var clicks = 0;
-var from;
-var to;
+	RADIUS_AROUND_POINTS : 2,
+	DEFAULT_TRIP_STOPS : 4,
+	clicks : 0,
+	from : null,
+	to : null,
+	currentPlaylist : [],
+	flightPlanCoordinates : [],
+	flightPlanNames : [],
+	explanations : [],
+	knownAnswers : 0,
+	geocoder : null,
+	map : null,
 
-var currentPlaylist = [];
-var flightPlanCoordinates;
-var flightPlanNames;
-var explanations = [];
-var knownAnswers = 0;
+	initialize : function(canvasElement, mapOptions) {
+		this.geocoder = new google.maps.Geocoder();
+		this.map = new google.maps.Map(canvasElement, mapOptions);
+		this.centerMap();
+		google.maps.event.addListener(this.map, 'click', $.proxy(this.gotMapClick, this));
+	},
 
-$(document).ready(function() {
-	// if (navigator.geolocation) {
-	// navigator.geolocation.getCurrentPosition(showPosition);
-	// } else {
-	// x.innerHTML = "Geolocation is not supported by this browser.";
-	// }
-	//
-	// function showPosition(position) {
-	// x.innerHTML = "Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude;
-	// }
-
-	var mapOptions = {
-		center : new google.maps.LatLng(-34.397, 150.644),
-		zoom : 3,
-		mapTypeId : google.maps.MapTypeId.ROADMAP
-	};
-	var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-
-	var geocoder = new google.maps.Geocoder();
-	var location = "Campina Grande";
-	geocoder.geocode({
-		'address' : location
-	}, function(results, status) {
-		if (status == google.maps.GeocoderStatus.OK) {
-			map.setCenter(results[0].geometry.location);
-		} else {
-			alert("Could not find location: " + location);
-		}
-	});
-
-	google.maps.event.addListener(map, 'click', function(event) {
-		if (clicks == 0) {
-			from = event.latLng;
-			drawMarker(from, map);
-		} else if (clicks == 1) {
-			to = event.latLng;
-			drawMarker(to, map);
-		}
-		clicks++;
-
-		if (clicks == 2) {
-			var travelTheme = $('#tripstyle').val();
-			if (travelTheme == "") {
-				travelTheme = "pop";
+	centerMap : function() {
+		var location = "Campina Grande";
+		this.geocoder.geocode({
+			'address' : location
+		}, function(results, status) {
+			if (status == google.maps.GeocoderStatus.OK) {
+				viaji.map.setCenter(results[0].geometry.location);
+			} else {
+				alert("Could not find location: " + location);
 			}
+		});
+	},
 
-			flightPlanCoordinates = getPointsInBetween(from, to, DEFAULT_TRIP_STOPS);
+	gotMapClick : function(event) {
+		console.log(this.clicks);
+		if (this.clicks == 0) {
+			this.from = event.latLng;
+			this.drawMarker(this.from, this.map);
+		} else if (this.clicks == 1) {
+			this.to = event.latLng;
+			this.drawMarker(this.to, this.map);
+		}
+		this.clicks++;
 
-			var flightPath = new google.maps.Polyline({
-				path : flightPlanCoordinates,
-				geodesic : true,
-				strokeColor : '#FF3300',
-				strokeOpacity : 0.7,
-				strokeWeight : 3
+		if (this.clicks >= 2) {
+			this.updateTrip();
+		}
+	},
+
+	updateTrip : function() {
+		var travelTheme = $('#tripstyle').val();
+		if (travelTheme == "") {
+			travelTheme = "pop";
+		}
+
+		this.flightPlanCoordinates = this.getPointsInBetween(this.from, this.to, this.DEFAULT_TRIP_STOPS);
+
+		var flightPath = new google.maps.Polyline({
+			path : this.flightPlanCoordinates,
+			geodesic : true,
+			strokeColor : '#FF3300',
+			strokeOpacity : 0.7,
+			strokeWeight : 3
+		});
+
+		flightPath.setMap(this.map);
+
+		// draw points
+		var count = 0;
+		for ( count = 1; count < this.flightPlanCoordinates.length - 1; count++) {
+			var point = this.flightPlanCoordinates[count];
+			this.drawPoint(point, this.map);
+		}
+
+		// get tracks
+		$("#tracks-status").text("fetching music");
+		for ( count = 0; count < this.flightPlanCoordinates.length; count++) {
+			var point = this.flightPlanCoordinates[count];
+			var totalTripStops = this.DEFAULT_TRIP_STOPS + 2;
+			viajisearch.getTracks(point, this.RADIUS_AROUND_POINTS, travelTheme, function(pointUsed, tracks, ids) {
+				var chosen = viaji.chooseTracksFromSample(tracks, ids);
+				var track_index = viaji.flightPlanCoordinates.indexOf(pointUsed);
+				viaji.currentPlaylist[track_index] = chosen;
+				viaji.explanations[track_index] = viaji.buildTextualDetails(pointUsed, tracks, ids, chosen);
+				viaji.knownAnswers++;
+				$("#tracks-status").text("got songs for " + viaji.knownAnswers + " of the " + totalTripStops + " stops in your trip");
+				if (viaji.knownAnswers == totalTripStops) {
+					viaji.setupPlayer();
+					viaji.updateDetails();
+				}
 			});
-
-			flightPath.setMap(map);
-
-			// draw points
-			var count = 0;
-			for ( count = 1; count < flightPlanCoordinates.length - 1; count++) {
-				var point = flightPlanCoordinates[count];
-				drawPoint(point, map);
-			}
-
-			// get tracks
-			$("#tracks-status").text("fetching music");
-			for ( count = 0; count < flightPlanCoordinates.length; count++) {
-				var point = flightPlanCoordinates[count];
-				var totalTripStops = DEFAULT_TRIP_STOPS + 2;
-				getTracks(point, RADIUS_AROUND_POINTS, travelTheme, function(pointUsed, tracks, ids) {
-					var chosen = chooseTracksFromSample(tracks, ids);
-					var track_index = flightPlanCoordinates.indexOf(pointUsed);
-					currentPlaylist[track_index] = chosen;
-					explanations[track_index] = buildTextualDetails(pointUsed, tracks, ids, chosen);
-					knownAnswers++;
-					$("#tracks-status").text("got songs for " + knownAnswers + " of the " + totalTripStops + " stops in your trip");
-					if (knownAnswers == totalTripStops) {
-						setupPlayer();
-						updateDetails();
-					}
-				});
-			}
 		}
-	});
+	},
 
-	function buildTextualDetails(point, tracks, ids, chosen_id) {
-		var explanation_index = flightPlanCoordinates.indexOf(point);
+	buildTextualDetails : function(point, tracks, ids, chosen_id) {
+		var explanation_index = this.flightPlanCoordinates.indexOf(point);
 		if (chosen_id == null) {
 			return "<span class=\"text-muted\"> Point " + (explanation_index + 1) + ": we couldn't find music in the theme around </span> " + point;
 		} else {
@@ -112,34 +109,34 @@ $(document).ready(function() {
 			var chosen_track = tracks[ids.indexOf(chosen_id)];
 			return "<span class=\"text-muted\">Point " + (explanation_index + 1) + ": around </span> " + point + "<span class=\"text-muted\"> we thought of </span>" + artists + "<span class=\"text-muted\">. We chose </span>" + chosen_track;
 		}
-	}
+	},
 
-	function updateDetails() {
+	updateDetails : function() {
 		$("#choice_details").empty();
-		$.each(explanations, function(i, v) {
+		$.each(this.explanations, function(i, v) {
 			var toadd = "<li class=\"list-group-item\">" + v + "</li>";
 			$("#choice_details").append(toadd);
 		});
-		createNamesForCoordinates(flightPlanCoordinates);
-	}
+		this.createNamesForCoordinates(this.flightPlanCoordinates);
+	},
 
 	/**
 	 * @param tracks List of names of tracks, X for the point in the trip.
 	 * @param ids in spotify namespace
 	 */
-	function chooseTracksFromSample(tracks, ids) {
+	chooseTracksFromSample : function(tracks, ids) {
 		var count;
 		for ( count = 0; count < ids.length; count++) {
-			if (currentPlaylist.indexOf(ids[count]) == -1) {
+			if (this.currentPlaylist.indexOf(ids[count]) == -1) {
 				return ids[count];
 			}
 		}
 		return null;
-	}
+	},
 
-	function setupPlayer() {
+	setupPlayer : function() {
 		var missedPoints = 0;
-		$.each(currentPlaylist, function(i, v) {
+		$.each(this.currentPlaylist, function(i, v) {
 			if (v != null) {
 				$("#playlist").attr("src", $("#playlist").attr("src") + v.split(":")[2] + ",");
 			} else {
@@ -147,19 +144,20 @@ $(document).ready(function() {
 			}
 		});
 		if (missedPoints > 0)
-			$("#player-status").text("(we couldn't find songs for " + missedPoints + " out of the " + knownAnswers + " points in the trip)");
-		fadeToPlaylist();
-	}
+			$("#player-status").text("(we couldn't find songs for " + missedPoints + " out of the " + this.knownAnswers + " points in the trip)");
+		navigation.fadeToPlaylist();
+	},
 
-	function drawMarker(thePosition, theMap) {
+	drawMarker : function(thePosition, theMap) {
 		new google.maps.Marker({
 			position : thePosition,
 			animation : google.maps.Animation.DROP,
+			draggable : true,
 			map : theMap
 		});
-	}
+	},
 
-	function drawPoint(thePosition, theMap) {
+	drawPoint : function(thePosition, theMap) {
 		new google.maps.Circle({
 			center : thePosition,
 			radius : 40000.0,
@@ -170,51 +168,51 @@ $(document).ready(function() {
 			strokeWeight : 1,
 			map : theMap
 		});
-	}
+	},
 
-	function getPointsInBetween(startPoint, endPoint, howManyPointsInBetween) {
+	getPointsInBetween : function(startPoint, endPoint, howManyPointsInBetween) {
 		var coords = [startPoint];
 		if (howManyPointsInBetween >= 1) {
-			incLat = getIncrementSize(startPoint.lat(), endPoint.lat(), howManyPointsInBetween);
-			incLng = getIncrementSize(startPoint.lng(), endPoint.lng(), howManyPointsInBetween);
+			incLat = this.getIncrementSize(startPoint.lat(), endPoint.lat(), howManyPointsInBetween);
+			incLng = this.getIncrementSize(startPoint.lng(), endPoint.lng(), howManyPointsInBetween);
 			for ( i = 1; i <= howManyPointsInBetween; i++) {
-				newLat = getIncrement(startPoint.lat(), endPoint.lat(), incLat * i);
-				newLng = getIncrement(startPoint.lng(), endPoint.lng(), incLng * i);
+				newLat = this.getIncrement(startPoint.lat(), endPoint.lat(), incLat * i);
+				newLng = this.getIncrement(startPoint.lng(), endPoint.lng(), incLng * i);
 				coords.push(new google.maps.LatLng(newLat, newLng));
 			}
 		}
 		coords.push(endPoint);
 		return coords;
-	}
+	},
 
-	function getIncrementSize(start, end, size) {
+	getIncrementSize : function(start, end, size) {
 		if (start >= end) {
 			return (start - end) / (size + 1);
 		} else {
 			return (end - start) / (size + 1);
 		}
-	}
+	},
 
-	function getIncrement(start, end, increment) {
+	getIncrement : function(start, end, increment) {
 		if (start >= end) {
 			return start - increment;
 		} else {
 			return start + increment;
 		}
-	}
+	},
 
-	function createNamesForCoordinates(flightCoordinates) {
-		flightPlanNames = [];
-		$.each(flightCoordinates, function(i, v) {
-			window.setTimeout(function() {
-				codeLatLng(v.k, v.A, flightPlanNames, i);
-			}, 1200);
-		});
-	}
+	createNamesForCoordinates : function(flightCoordinates) {
+		this.flightPlanNames = [];
+		$.each(flightCoordinates, $.proxy(function(i, v) {
+			window.setTimeout($.proxy(function() {
+				this.codeLatLng(v.k, v.A, this.flightPlanNames, i);
+			}, this), 1200);
+		}, this));
+	},
 
-	function codeLatLng(lat, lng, namesArray, i) {
+	codeLatLng : function(lat, lng, namesArray, i) {
 		var latlng = new google.maps.LatLng(lat, lng);
-		geocoder.geocode({
+		this.geocoder.geocode({
 			'latLng' : latlng
 		}, function(results, status) {
 			if (status == google.maps.GeocoderStatus.OK) {
@@ -229,6 +227,23 @@ $(document).ready(function() {
 			}
 		});
 	}
+};
 
-});
+var navigation = {
+	fadeToMap : function() {
+		$("#route").fadeTo("slow", 1);
+	},
+
+	fadeToPlaylist : function() {
+		this.goToByScroll("#playlistdiv");
+		$("#playlistdiv").fadeTo("slow", 1);
+	},
+
+	goToByScroll : function(id) {
+		// Scroll
+		$('html,body').animate({
+			scrollTop : $(id).offset().top
+		}, 'slow');
+	}
+};
 

@@ -6,10 +6,11 @@
 		<link href="css/bootstrap.css" rel="stylesheet">
 		<script type="text/javascript"
 		src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDFBRMj_R_eCBebGLSFuKviKayRSod8XFE&sensor=SET_TO_TRUE_OR_FALSE"></script>
-		<script type="text/javascript" src="vendor/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="js/lib/jquery-2.1.1.min.js"></script>
 		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src = "js/viaji.js"></script>
-		<script type="text/javascript" src = "js/mapa.js"></script>
+		<script type="text/javascript" src="js/viaji.tracksearch.js"></script>
+		<script type="text/javascript" src="js/viaji.js"></script>
+		<script type="text/javascript" src="js/main.js"></script>
 	</head>
 	<body>
 		<div class="container">
@@ -31,7 +32,7 @@
 						<div class="input-group">
 							<input id="tripstyle" class="form-control" placeholder="eg: funk, samba, cha-cha-cha, ..." type="text">
 							<span class="input-group-btn"> <a href="#route">
-								<button class="btn btn-default" type="button" onclick="fadeToMap()" >
+								<button class="btn btn-default" type="button" onclick="navigation.fadeToMap()" >
 									go
 								</button> </span>
 							</a>
