@@ -3,15 +3,18 @@ viaji = {
 	RADIUS_AROUND_POINTS : 2,
 	DEFAULT_TRIP_STOPS : 4,
 	clicks : 0,
+	map : null,
+	geocoder : null,
+	// trip data
 	from : null,
 	to : null,
-	currentPlaylist : [],
 	flightPlanCoordinates : [],
 	flightPlanNames : [],
-	explanations : [],
 	knownAnswers : 0,
-	geocoder : null,
-	map : null,
+	nameAnswers : 0,
+	// playlist data
+	currentPlaylist : [],
+	explanations : [],
 
 	initialize : function(canvasElement, mapOptions) {
 		this.geocoder = new google.maps.Geocoder();
@@ -34,7 +37,6 @@ viaji = {
 	},
 
 	gotMapClick : function(event) {
-		console.log(this.clicks);
 		if (this.clicks == 0) {
 			this.from = event.latLng;
 			this.drawMarker(this.from, this.map);
@@ -76,33 +78,41 @@ viaji = {
 
 		// get tracks
 		$("#tracks-status").text("fetching music");
+		var totalTripStops = this.DEFAULT_TRIP_STOPS + 2;
+		this.currentPlaylist = Array(totalTripStops);
+		this.explanations = Array(totalTripStops);
+		this.knownAnswers = 0;
+		failureCallback = function(x, reason) {
+			console.log(reason);
+			this.knownAnswers++;
+		};
+
 		for ( count = 0; count < this.flightPlanCoordinates.length; count++) {
 			var point = this.flightPlanCoordinates[count];
-			var totalTripStops = this.DEFAULT_TRIP_STOPS + 2;
-			viajisearch.getTracks(point, this.RADIUS_AROUND_POINTS, travelTheme, function(pointUsed, tracks, ids) {
-				var chosen = viaji.chooseTracksFromSample(tracks, ids);
-				var track_index = viaji.flightPlanCoordinates.indexOf(pointUsed);
-				viaji.currentPlaylist[track_index] = chosen;
-				viaji.explanations[track_index] = viaji.buildTextualDetails(pointUsed, tracks, ids, chosen);
-				viaji.knownAnswers++;
-				$("#tracks-status").text("got songs for " + viaji.knownAnswers + " of the " + totalTripStops + " stops in your trip");
-				if (viaji.knownAnswers == totalTripStops) {
-					viaji.setupPlayer();
-					viaji.updateDetails();
+			viajisearch.getTracks(point, this.RADIUS_AROUND_POINTS, travelTheme, $.proxy(function(pointUsed, tracks, ids) {
+				var chosen = this.chooseTracksFromSample(tracks, ids);
+				var track_index = this.flightPlanCoordinates.indexOf(pointUsed);
+				this.currentPlaylist[track_index] = chosen;
+				this.explanations[track_index] = this.buildTextualDetails(pointUsed, tracks, ids, chosen);
+				this.knownAnswers++;
+				$("#tracks-status").text("got songs for " + this.knownAnswers + " of the " + totalTripStops + " stops in your trip");
+				if (this.knownAnswers == totalTripStops) {
+					this.setupPlayer();
+					this.updateDetails();
 				}
-			});
+			}, this), $.proxy(failureCallback(), this));
 		}
 	},
 
 	buildTextualDetails : function(point, tracks, ids, chosen_id) {
 		var explanation_index = this.flightPlanCoordinates.indexOf(point);
-		if (chosen_id == null) {
+		if (chosen_id == null || chosen_id == undefined) {
 			return "<span class=\"text-muted\"> Point " + (explanation_index + 1) + ": we couldn't find music in the theme around </span> " + point;
 		} else {
 			var artists = [];
 			$.each(tracks, function(i, v) {
 				var toadd = " ";
-				if (i == tracks.length - 1)
+				if (i > 0 && i == tracks.length - 1)
 					toadd += "or ";
 				artists.push(toadd + v.split(" -")[0]);
 			});
@@ -125,13 +135,20 @@ viaji = {
 	 * @param ids in spotify namespace
 	 */
 	chooseTracksFromSample : function(tracks, ids) {
+		// TODO not sure I manage to make choice random here. always seems the same.
+
+		// some randomness
+		idss = ids.slice(0);
+		idss.sort(function() {
+			return .5 - Math.random();
+		});
 		var count;
-		for ( count = 0; count < ids.length; count++) {
-			if (this.currentPlaylist.indexOf(ids[count]) == -1) {
-				return ids[count];
+		for ( count = 0; count < idss.length; count++) {
+			if (this.currentPlaylist.indexOf(idss[count]) == -1) {
+				return idss[count];
 			}
 		}
-		return null;
+		return undefined;
 	},
 
 	setupPlayer : function() {
@@ -152,7 +169,7 @@ viaji = {
 		new google.maps.Marker({
 			position : thePosition,
 			animation : google.maps.Animation.DROP,
-			draggable : true,
+			//draggable : true,
 			map : theMap
 		});
 	},
@@ -202,7 +219,7 @@ viaji = {
 	},
 
 	createNamesForCoordinates : function(flightCoordinates) {
-		this.flightPlanNames = [];
+		this.flightPlanNames = Array(flightCoordinates.length);
 		$.each(flightCoordinates, $.proxy(function(i, v) {
 			window.setTimeout($.proxy(function() {
 				this.codeLatLng(v.k, v.A, this.flightPlanNames, i);
@@ -214,9 +231,8 @@ viaji = {
 		var latlng = new google.maps.LatLng(lat, lng);
 		this.geocoder.geocode({
 			'latLng' : latlng
-		}, function(results, status) {
+		}, $.proxy(function(results, status) {
 			if (status == google.maps.GeocoderStatus.OK) {
-				console.log(results)
 				if (results[3]) {
 					namesArray[i] = results[3];
 				} else {
@@ -225,7 +241,15 @@ viaji = {
 			} else {
 				console.log("Geocoder failed due to: " + status);
 			}
-		});
+			this.nameAnswers++;
+			if (this.nameAnswers == this.flightPlanCoordinates.length) {
+				this.updateNamesInTable();
+			}
+		}, this));
+	},
+
+	updateNamesInTable : function() {
+		console.log(this.flightPlanNames);
 	}
 };
 

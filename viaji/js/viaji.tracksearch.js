@@ -6,7 +6,7 @@ viajisearch = {
 	 * @param {Object} genre
 	 * @param {Object} callback
 	 */
-	getTracks : function(point, radius, genre, callback) {
+	getTracks : function(point, radius, genre, successCallback, failureCallback) {
 		var lat = point.lat();
 		var lng = point.lng();
 		var variation = radius;
@@ -14,13 +14,23 @@ viajisearch = {
 		var max_latitude = lat + variation;
 		var min_longitude = lng - variation;
 		var max_longitude = lng + variation;
-		var request_url = "http://developer.echonest.com/api/v4/song/search?api_key=NNDIE5MEWU4J2ZPJQ&format=json&min_longitude=" + min_longitude + "&max_longitude=" + max_longitude + "&min_latitude=" + min_latitude + "&max_latitude=" + max_latitude + "&bucket=artist_location&description=" + genre + "&sort=song_hotttnesss-desc&bucket=id:spotifyv2-ZZ&bucket=tracks&results=100";
-		var params = {};
-		
+		var request_url = "http://developer.echonest.com/api/v4/song/search?bucket=artist_location&bucket=id:spotifyv2-ZZ&bucket=tracks&";
+		var params = {
+			api_key : "NNDIE5MEWU4J2ZPJQ",
+			format : "json",
+			min_longitude : min_longitude,
+			max_longitude : max_longitude,
+			min_latitude : min_latitude,
+			max_latitude : max_latitude,
+			description : genre,
+			sort : "song_hotttnesss-desc",
+			results : 100
+		};
+
 		//console.log(request_url);
 		$.ajax({
 			dataType : "json",
-			url : request_url,
+			url : request_url + $.param(params),
 			success : function(response) {
 				songs = response.response.songs;
 				var selected_tracks = [];
@@ -37,7 +47,10 @@ viajisearch = {
 				//	console.log(item);
 				//});
 
-				callback(point, selected_tracks, track_ids);
+				successCallback(point, selected_tracks, track_ids);
+			}, 
+			error : function(jqXHR, textStatus){
+				failureCallback(textStatus);
 			}
 		});
 	}
