@@ -71,7 +71,7 @@ viaji = {
 
 		// draw points
 		var count = 0;
-		for ( count = 1; count < this.flightPlanCoordinates.length - 1; count++) {
+		for ( count = 0; count < this.flightPlanCoordinates.length; count++) {
 			var point = this.flightPlanCoordinates[count];
 			this.drawPoint(point, this.map);
 		}
@@ -177,12 +177,12 @@ viaji = {
 	drawPoint : function(thePosition, theMap) {
 		new google.maps.Circle({
 			center : thePosition,
-			radius : 40000.0,
-			strokeColor : '#FF3300',
-			strokeOpacity : 0.2,
-			fillColor : '#FF3300',
-			fillOpacity : 0.7,
-			strokeWeight : 1,
+			radius : 45000.0,
+			strokeColor : '#FF22613',
+			strokeOpacity : 0.8,
+			fillColor : '#FFECDB',
+			fillOpacity : 0.6,
+			strokeWeight : 2,
 			map : theMap
 		});
 	},
