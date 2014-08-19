@@ -181,14 +181,16 @@ viaji = {
 	},
 
 	drawPoint : function(thePosition, theMap) {
-		new google.maps.Circle({
-			center : thePosition,
-			radius : 45000.0,
-			strokeColor : '#FF22613',
-			strokeOpacity : 0.8,
-			fillColor : '#FFECDB',
-			fillOpacity : 0.6,
-			strokeWeight : 2,
+		new google.maps.Marker({
+			position : thePosition,
+			icon : {
+				path : google.maps.SymbolPath.CIRCLE,
+				fillColor : '#ecf0f1',
+				fillOpacity : 1,
+				strokeColor : '#e74c3c',
+				strokeWeight: 2.5,
+				scale : 5
+			},
 			map : theMap
 		});
 	},
