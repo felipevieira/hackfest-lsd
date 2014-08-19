@@ -82,9 +82,15 @@ viaji = {
 		this.currentPlaylist = Array(totalTripStops);
 		this.explanations = Array(totalTripStops);
 		this.knownAnswers = 0;
-		failureCallback = function(x, reason) {
-			console.log(reason);
+		failureCallback = function(jqXHR, textStatus, errorThrown, pointUsed) {
+			console.log(textStatus);
 			this.knownAnswers++;
+			var track_index = this.flightPlanCoordinates.indexOf(pointUsed);
+			this.explanations[track_index] = this.buildTextualDetails(pointUsed);
+			if (this.knownAnswers == totalTripStops) {
+				this.setupPlayer();
+				this.updateDetails();
+			}
 		};
 
 		for ( count = 0; count < this.flightPlanCoordinates.length; count++) {
@@ -100,14 +106,14 @@ viaji = {
 					this.setupPlayer();
 					this.updateDetails();
 				}
-			}, this), $.proxy(failureCallback(), this));
+			}, this), $.proxy(failureCallback, this));
 		}
 	},
 
 	buildTextualDetails : function(point, tracks, ids, chosen_id) {
 		var explanation_index = this.flightPlanCoordinates.indexOf(point);
 		if (chosen_id == null || chosen_id == undefined) {
-			return "<span class=\"text-muted\"> Point " + (explanation_index + 1) + ": we couldn't find music in the theme around </span> " + point;
+			return "<span class=\"text-muted\"> Point " + (explanation_index + 1) + ": we couldn't find music for the trip near </span> " + point;
 		} else {
 			var artists = [];
 			$.each(tracks, function(i, v) {

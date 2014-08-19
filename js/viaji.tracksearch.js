@@ -49,8 +49,8 @@ viajisearch = {
 
 				successCallback(point, selected_tracks, track_ids);
 			}, 
-			error : function(jqXHR, textStatus){
-				failureCallback(textStatus);
+			error : function(jqXHR, textStatus, errorThrown){
+				failureCallback(jqXHR, textStatus, errorThrown, point);
 			}
 		});
 	}
