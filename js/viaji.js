@@ -20,7 +20,7 @@ viaji = {
 	initialize : function(canvasElement, mapOptions) {
 		this.geocoder = new google.maps.Geocoder();
 		this.map = new google.maps.Map(canvasElement, mapOptions);
-		this.centerMap();
+		//this.centerMap();
 		google.maps.event.addListener(this.map, 'click', $.proxy(this.gotMapClick, this));
 	},
 
