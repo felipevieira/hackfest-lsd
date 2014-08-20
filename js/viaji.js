@@ -319,6 +319,17 @@ var navigation = {
 		$('html,body').animate({
 			scrollTop : $(id).offset().top
 		}, 'slow');
+	},
+
+	showHideOptions : function() {
+		if ($("#options_btn").text() === "+") {
+			$("#options_div").show("fast");
+			$("#options_btn").text("-");
+		} else {
+			$("#options_div").hide("fast");
+			$("#options_btn").text("+");			
+		}
 	}
+
 };
 

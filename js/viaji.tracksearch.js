@@ -1,4 +1,9 @@
 viajisearch = {
+
+	getTracksExtraParams : {
+		sort : "song_hotttnesss-desc"
+	},
+
 	/**
 	 * The function to get data tracks from Echonest based on latitude, longitude and buffer size.
 	 * @param {Object} point
@@ -23,8 +28,10 @@ viajisearch = {
 			min_latitude : min_latitude,
 			max_latitude : max_latitude,
 			description : genre,
-			sort : "song_hotttnesss-desc",
 			results : 100
+		};
+		for (var attrname in this.getTracksExtraParams) {
+			params[attrname] = this.getTracksExtraParams[attrname];
 		};
 
 		//console.log(request_url);
@@ -51,9 +58,24 @@ viajisearch = {
 				failureCallback(jqXHR, textStatus, errorThrown, point);
 			}
 		});
-	}
+	},
 	// radius = 2 eh o suficiente pra incluir ateh patos com CG como centro
 	//getTracks(-7, -35, 2, "forró" , function(names, ids) {console.log(names); console.log(ids)});
+
+	sortChoicesMap : {
+		"trendy" : "song_hotttnesss-desc",
+		"familiar" : "artist_familiarity-desc",
+		"strange" : "artist_familiarity-asc"
+	},
+
+	/**
+	 * The function to set user's choice related to music sorting.
+	 * @param {Object} sortChoice - One of the following: trendy, familiar, strange
+	 */
+	setParamSort : function (sortChoice) {
+		this.getTracksExtraParams["sort"] = this.sortChoicesMap[sortChoice];
+		console.log('===> ' + this.getTracksExtraParams["sort"]);
+	}
 
 };
 
