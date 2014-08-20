@@ -47,7 +47,7 @@ viaji = {
 		}
 		this.clicks++;
 
-		if (this.clicks >= 2) {
+		if (this.clicks == 2) {
 			this.updateTrip();
 		}
 	},
@@ -306,12 +306,13 @@ viaji = {
 
 var navigation = {
 	fadeToMap : function() {
+		this.goToByScroll("#route");
 		$("#route").fadeTo("slow", 1);
 	},
 
 	fadeToPlaylist : function() {
-		this.goToByScroll("#playlistdiv");
 		$("#playlistdiv").fadeTo("slow", 1);
+		this.goToByScroll("#playlistdiv");
 	},
 
 	goToByScroll : function(id) {
@@ -332,4 +333,3 @@ var navigation = {
 	}
 
 };
-

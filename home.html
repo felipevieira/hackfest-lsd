@@ -31,28 +31,28 @@
 						<br>
 						<div class="input-group">
 							<input id="tripstyle" class="form-control" placeholder="eg: funk, samba, cha-cha-cha, ..." type="text">
-							<span class="input-group-btn"> 
-								<a href="#route">
-									<button class="btn btn-default" type="button" onclick="navigation.fadeToMap()" > go </button>
-								</a>
-								<button id="options_btn" class="btn btn-default" type="button" onclick="navigation.showHideOptions()" >+</button>
-							</span>
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button" onclick="navigation.fadeToMap()" >
+									go
+								</button>
+								<button id="options_btn" class="btn btn-default" type="button" onclick="navigation.showHideOptions()" >+</button></span>
 							<!-- <span class="input-group-addon">set</span> -->
 						</div>
 					</div>
-					<br>
 					<div id="options_div" class="row" style="display: none">
 						<p>
-							Favor
-							<input type="radio" name="listen_sort" value="trendy">Trendy,
-							<input type="radio" name="listen_sort" value="familiar">Familiar, or
-							<input type="radio" name="listen_sort" value="strange"> Strange
+							<input type="radio" name="listen_sort" value="trendy">
+							Trendy,
+							<input type="radio" name="listen_sort" value="familiar">
+							familiar, or
+							<input type="radio" name="listen_sort" value="strange">
+							strange
 							songs.
 						</p>
 						<script>
 							$("input:radio[name=listen_sort]").click(function() {
-    							var checked_value = $(this).val();
-    							viajisearch.setParamSort(checked_value);
+								var checked_value = $(this).val();
+								viajisearch.setParamSort(checked_value);
 							});
 						</script>
 					</div>

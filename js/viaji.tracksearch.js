@@ -74,7 +74,6 @@ viajisearch = {
 	 */
 	setParamSort : function (sortChoice) {
 		this.getTracksExtraParams["sort"] = this.sortChoicesMap[sortChoice];
-		console.log('===> ' + this.getTracksExtraParams["sort"]);
 	}
 
 };

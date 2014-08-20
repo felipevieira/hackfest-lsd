@@ -31,7 +31,6 @@ $(document).ready(function() {
 	$("#route").fadeTo("fast", 0.33);
 	$("#playlistdiv").fadeTo("fast", 0.33);
 
-
 	var mapOptions = {
 		center : new google.maps.LatLng(-34.397, 150.644),
 		zoom : 3,
@@ -40,4 +39,10 @@ $(document).ready(function() {
 
 	viaji.initialize(document.getElementById("map_canvas"), mapOptions);
 
+	// Event handller
+	$('#tripstyle').keypress(function(e) {
+		if (e.which == 13) {
+			navigation.fadeToMap();
+		}
+	});
 });
