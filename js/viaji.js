@@ -125,7 +125,7 @@ viaji = {
 	buildTextualDetails : function(explanationIndex, tracks, chosen) {
 		var point = this.flightPlanCoordinates[explanationIndex];
 		if (chosen == null || chosen == undefined) {
-			return "<span class=\"text-muted\"> Point " + (explanationIndex + 1) + ": we couldn't find music for the trip near </span> " + point;
+			return "<span class=\"text-muted\"> Point " + (explanationIndex + 1) + ": we couldn't find music for the trip near </span> <span id='exp-" + explanationIndex + "'>" + point;
 		} else {
 			var artists = [];
 			$.each(tracks, function(i, v) {
