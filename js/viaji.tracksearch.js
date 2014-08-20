@@ -14,7 +14,7 @@ viajisearch = {
 		var max_latitude = lat + variation;
 		var min_longitude = lng - variation;
 		var max_longitude = lng + variation;
-		var request_url = "http://developer.echonest.com/api/v4/song/search?bucket=artist_location&bucket=id:spotifyv2-ZZ&bucket=tracks&";
+		var request_url = "http://developer.echonest.com/api/v4/song/search?bucket=artist_location&bucket=id:spotifyv2-ZZ&bucket=tracks&bucket=audio_summary&";
 		var params = {
 			api_key : "NNDIE5MEWU4J2ZPJQ",
 			format : "json",
@@ -35,19 +35,17 @@ viajisearch = {
 				songs = response.response.songs;
 				var selected_tracks = [];
 				var selected_artists = [];
-				var track_ids = [];
 				$.each(songs, function(i, item) {
 					if (selected_artists.indexOf(item.artist_name) == -1 && selected_tracks.length < 10 && item.tracks.length > 0) {
 						selected_artists.push(item.artist_name);
-						selected_tracks.push(item.artist_name + " - " + item.title);
-						track_ids.push(item.tracks[0].foreign_id);
+						selected_tracks.push({'track_name' : item.artist_name + " - " + item.title, 'audio_summary' : item.audio_summary, 'id' : item.tracks[0].foreign_id, 'artist_location' : item.artist_location});
 					}
 				});
 				//$.each(selected_tracks, function(i, item) {
 				//	console.log(item);
 				//});
 
-				successCallback(point, selected_tracks, track_ids);
+				successCallback(point, selected_tracks);
 			}, 
 			error : function(jqXHR, textStatus, errorThrown){
 				failureCallback(jqXHR, textStatus, errorThrown, point);
