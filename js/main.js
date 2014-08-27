@@ -31,11 +31,13 @@ $(document).ready(function() {
 	$("#route").fadeTo("fast", 0.33);
 	$("#playlistdiv").fadeTo("fast", 0.33);
 
+	var map_style = [{"featureType":"all","elementType":"all","stylers":[{"invert_lightness":true},{"saturation":10},{"lightness":30},{"gamma":0.5},{"hue":"#435158"}]}]
 
 	var mapOptions = {
 		center : new google.maps.LatLng(-34.397, 150.644),
 		zoom : 3,
-		mapTypeId : google.maps.MapTypeId.ROADMAP
+		mapTypeId : google.maps.MapTypeId.ROADMAP,
+		styles: map_style
 	};
 
 	viaji.initialize(document.getElementById("map_canvas"), mapOptions);
