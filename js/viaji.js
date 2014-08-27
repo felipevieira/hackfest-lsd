@@ -323,7 +323,7 @@ var navigation = {
 	},
 
 	showHideOptions : function() {
-		if ($("#options_btn").text() === "+") {
+		if ($("#options_btn").text().indexOf("+") != -1) {
 			$("#options_div").show("fast");
 			$("#options_btn").text("-");
 		} else {

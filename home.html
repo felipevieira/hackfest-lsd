@@ -13,9 +13,26 @@
 		<script type="text/javascript" src="js/main.js"></script>
 	</head>
 	<body>
+		<!-- Facebook include for like button -->
+		<div id="fb-root"></div>
+		<script>
+			( function(d, s, id) {
+					var js, fjs = d.getElementsByTagName(s)[0];
+					if (d.getElementById(id))
+						return;
+					js = d.createElement(s);
+					js.id = id;
+					js.src = "http://connect.facebook.net/en_US/sdk.js#xfbml=1&appId=1464352757157292&version=v2.0";
+					fjs.parentNode.insertBefore(js, fjs);
+				}(document, 'script', 'facebook-jssdk'));
+		</script>
+
 		<div class="container">
 			<div class="row">
 				<img src="img/logo.jpeg" />
+			</div>
+			<div class="row">
+				From A to B in 6 songs. 
 			</div>
 			<div class="row">
 				<br />
@@ -35,7 +52,9 @@
 								<button class="btn btn-default" type="button" onclick="navigation.fadeToMap()" >
 									go
 								</button>
-								<button id="options_btn" class="btn btn-default" type="button" onclick="navigation.showHideOptions()" >+</button></span>
+								<button id="options_btn" class="btn btn-default" type="button" onclick="navigation.showHideOptions()" >
+									+
+								</button></span>
 							<!-- <span class="input-group-addon">set</span> -->
 						</div>
 					</div>
@@ -76,7 +95,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="row">
+			<div class="row"id="playlistdiv">
 				<br>
 				<br />
 				<br />
@@ -84,7 +103,7 @@
 				<div class="col-md-1">
 					<h4 class="featurette-heading text-muted">the music</h4>
 				</div>
-				<div id="playlistdiv" class="col-md-6">
+				<div  class="col-md-6">
 					<h4 class="featurette-heading">Done. Time to relax and enjoy the cruise</h4>
 					<span id="player-status" class="text-muted"></span>
 					<br />
@@ -92,6 +111,15 @@
 					<iframe id="playlist" src="https://embed.spotify.com/?uri=spotify:trackset:Que viaji:" width="400" height="400" frameborder="0" allowtransparency="true"></iframe>
 					<br />
 					<span class="text-muted">you can also check out <a href="#detailsrow">how the playlist was chosen</a> or <a href="/">start over</a>.</span>
+				</div>
+
+				<div class = "col-md-2">
+					<div class="row">
+						spread viajj
+					</div>
+					<div class="row">
+						<div class="fb-like" data-href="http://viajj.herokuapp.com" data-width="50" data-layout="box_count" data-action="like" data-show-faces="true" data-share="true"></div>
+					</div>
 				</div>
 			</div>
 
