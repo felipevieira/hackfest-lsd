@@ -31,13 +31,30 @@
 						<br>
 						<div class="input-group">
 							<input id="tripstyle" class="form-control" placeholder="eg: funk, samba, cha-cha-cha, ..." type="text">
-							<span class="input-group-btn"> <a href="#route">
+							<span class="input-group-btn">
 								<button class="btn btn-default" type="button" onclick="navigation.fadeToMap()" >
 									go
-								</button> </span>
-							</a>
+								</button>
+								<button id="options_btn" class="btn btn-default" type="button" onclick="navigation.showHideOptions()" >+</button></span>
 							<!-- <span class="input-group-addon">set</span> -->
 						</div>
+					</div>
+					<div id="options_div" class="row" style="display: none">
+						<p>
+							<input type="radio" name="listen_sort" value="trendy">
+							Trendy,
+							<input type="radio" name="listen_sort" value="familiar">
+							familiar, or
+							<input type="radio" name="listen_sort" value="strange">
+							strange
+							songs.
+						</p>
+						<script>
+							$("input:radio[name=listen_sort]").click(function() {
+								var checked_value = $(this).val();
+								viajisearch.setParamSort(checked_value);
+							});
+						</script>
 					</div>
 				</div>
 			</div>
@@ -74,7 +91,7 @@
 					<br />
 					<iframe id="playlist" src="https://embed.spotify.com/?uri=spotify:trackset:Que viaji:" width="400" height="400" frameborder="0" allowtransparency="true"></iframe>
 					<br />
-					<span class="text-muted">you can also check out <a href="#detailsrow">how the playlist was chosen</a> or <a href="index.html">start over</a>.</span>
+					<span class="text-muted">you can also check out <a href="#detailsrow">how the playlist was chosen</a> or <a href="/">start over</a>.</span>
 				</div>
 			</div>
 

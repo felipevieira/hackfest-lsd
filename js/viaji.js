@@ -15,11 +15,12 @@ viaji = {
 	// playlist data
 	currentPlaylist : [],
 	explanations : [],
+	playlistCandidates : [],
 
 	initialize : function(canvasElement, mapOptions) {
 		this.geocoder = new google.maps.Geocoder();
 		this.map = new google.maps.Map(canvasElement, mapOptions);
-		this.centerMap();
+		//this.centerMap();
 		google.maps.event.addListener(this.map, 'click', $.proxy(this.gotMapClick, this));
 	},
 
@@ -46,7 +47,7 @@ viaji = {
 		}
 		this.clicks++;
 
-		if (this.clicks >= 2) {
+		if (this.clicks == 2) {
 			this.updateTrip();
 		}
 	},
@@ -82,42 +83,59 @@ viaji = {
 		this.currentPlaylist = Array(totalTripStops);
 		this.explanations = Array(totalTripStops);
 		this.knownAnswers = 0;
-		failureCallback = function(x, reason) {
-			console.log(reason);
+		failureCallback = function(jqXHR, textStatus, errorThrown, pointUsed) {
+			console.log(textStatus);
 			this.knownAnswers++;
+			var track_index = this.flightPlanCoordinates.indexOf(pointUsed);
+			this.explanations[track_index] = this.buildTextualDetails(pointUsed);
+			if (this.knownAnswers == totalTripStops) {
+				this.chooseTracks();
+				this.setupPlayer();
+				this.updateDetails();
+			}
 		};
 
 		for ( count = 0; count < this.flightPlanCoordinates.length; count++) {
 			var point = this.flightPlanCoordinates[count];
-			viajisearch.getTracks(point, this.RADIUS_AROUND_POINTS, travelTheme, $.proxy(function(pointUsed, tracks, ids) {
-				var chosen = this.chooseTracksFromSample(tracks, ids);
+			viajisearch.getTracks(point, this.RADIUS_AROUND_POINTS, travelTheme, $.proxy(function(pointUsed, tracks) {
 				var track_index = this.flightPlanCoordinates.indexOf(pointUsed);
-				this.currentPlaylist[track_index] = chosen;
-				this.explanations[track_index] = this.buildTextualDetails(pointUsed, tracks, ids, chosen);
+				this.playlistCandidates[track_index] = tracks;
 				this.knownAnswers++;
 				$("#tracks-status").text("got songs for " + this.knownAnswers + " of the " + totalTripStops + " stops in your trip");
 				if (this.knownAnswers == totalTripStops) {
+					this.chooseTracks();
 					this.setupPlayer();
 					this.updateDetails();
 				}
-			}, this), $.proxy(failureCallback(), this));
+			}, this), $.proxy(failureCallback, this));
 		}
 	},
 
-	buildTextualDetails : function(point, tracks, ids, chosen_id) {
-		var explanation_index = this.flightPlanCoordinates.indexOf(point);
-		if (chosen_id == null || chosen_id == undefined) {
-			return "<span class=\"text-muted\"> Point " + (explanation_index + 1) + ": we couldn't find music in the theme around </span> " + point;
+	chooseTracks : function() {
+		var count;
+		var chosen;
+		for ( count = 0; count < this.playlistCandidates.length; count++) {
+			var tracks = this.playlistCandidates[count];
+			chosen = this.chooseTracksFromSample(chosen, tracks, this.currentPlaylist);
+			this.explanations[count] = this.buildTextualDetails(count, tracks, chosen);
+			this.currentPlaylist[count] = chosen;
+		}
+	},
+
+	buildTextualDetails : function(explanationIndex, tracks, chosen) {
+		var point = this.flightPlanCoordinates[explanationIndex];
+		if (chosen == null || chosen == undefined) {
+			return "<span class=\"text-muted\"> Point " + (explanationIndex + 1) + ": we couldn't find music for the trip near </span> <span id='exp-" + explanationIndex + "'>" + point;
 		} else {
 			var artists = [];
 			$.each(tracks, function(i, v) {
 				var toadd = " ";
 				if (i > 0 && i == tracks.length - 1)
 					toadd += "or ";
-				artists.push(toadd + v.split(" -")[0]);
+				artists.push(toadd + v.track_name.split(" -")[0]);
 			});
-			var chosen_track = tracks[ids.indexOf(chosen_id)];
-			return "<span class=\"text-muted\">Point " + (explanation_index + 1) + ": around </span> " + point + "<span class=\"text-muted\"> we thought of </span>" + artists + "<span class=\"text-muted\">. We chose </span>" + chosen_track;
+			var chosenTrackName = chosen.track_name;
+			return "<span class=\"text-muted\">Point " + (explanationIndex + 1) + ": around </span> <span id='exp-" + explanationIndex + "'>" + point + "</span> <span class=\"text-muted\"> we thought of </span>" + artists + "<span class=\"text-muted\">. We chose </span>" + chosenTrackName;
 		}
 	},
 
@@ -134,28 +152,58 @@ viaji = {
 	 * @param tracks List of names of tracks, X for the point in the trip.
 	 * @param ids in spotify namespace
 	 */
-	chooseTracksFromSample : function(tracks, ids) {
-		// TODO not sure I manage to make choice random here. always seems the same.
-
+	chooseTracksFromSample : function(previousChosen, tracks, allPrevious) {
 		// some randomness
-		idss = ids.slice(0);
-		idss.sort(function() {
-			return .5 - Math.random();
-		});
+		if ( typeof previousChosen == "undefined") {
+			tracks.sort(function() {
+				return .5 - Math.random();
+			});
+			return tracks[0];
+		}
+
 		var count;
-		for ( count = 0; count < idss.length; count++) {
-			if (this.currentPlaylist.indexOf(idss[count]) == -1) {
-				return idss[count];
+		var dissimilarity = Number.MAX_VALUE;
+		var trackChosen;
+		for ( count = 0; count < tracks.length; count++) {
+			var currentTrack = tracks[count];
+			var computedDissimilarity = this.computeDissimilarity(previousChosen, currentTrack);
+			if (computedDissimilarity < dissimilarity && this.findTrackInAList(currentTrack, allPrevious) == -1) {
+				dissimilarity = computedDissimilarity;
+				trackChosen = currentTrack;
 			}
 		}
-		return undefined;
+		return trackChosen;
+	},
+
+	findTrackInAList : function(track, tracksList) {
+		var count;
+		for ( count = 0; count < tracksList.length; count++) {
+			var currentTrack = tracksList[count];
+			if ( typeof currentTrack != "undefined" && currentTrack.track_name == track.track_name) {
+				return currentTrack;
+			}
+		}
+		return -1;
+	},
+
+	computeDissimilarity : function(track1, track2) {
+		var summary1 = track1.audio_summary;
+		var summary2 = track2.audio_summary;
+
+		var metrics1 = [summary1.tempo / 180, summary1.speechiness, summary1.acousticness, summary1.instrumentalness, summary1.valence, summary1.danceability];
+		var metrics2 = [summary2.tempo / 180, summary2.speechiness, summary2.acousticness, summary2.instrumentalness, summary2.valence, summary2.danceability];
+		var dist = 0;
+		$.each(metrics1, function(i, v) {
+			var dist = dist + Math.pow(metrics1[i] - metrics2[i], 2);
+		});
+		return Math.sqrt(dist);
 	},
 
 	setupPlayer : function() {
 		var missedPoints = 0;
 		$.each(this.currentPlaylist, function(i, v) {
 			if (v != null) {
-				$("#playlist").attr("src", $("#playlist").attr("src") + v.split(":")[2] + ",");
+				$("#playlist").attr("src", $("#playlist").attr("src") + v.id.split(":")[2] + ",");
 			} else {
 				missedPoints++;
 			}
@@ -175,14 +223,16 @@ viaji = {
 	},
 
 	drawPoint : function(thePosition, theMap) {
-		new google.maps.Circle({
-			center : thePosition,
-			radius : 45000.0,
-			strokeColor : '#FF22613',
-			strokeOpacity : 0.8,
-			fillColor : '#FFECDB',
-			fillOpacity : 0.6,
-			strokeWeight : 2,
+		new google.maps.Marker({
+			position : thePosition,
+			icon : {
+				path : google.maps.SymbolPath.CIRCLE,
+				fillColor : '#ecf0f1',
+				fillOpacity : 1,
+				strokeColor : '#e74c3c',
+				strokeWeight : 2.5,
+				scale : 5
+			},
 			map : theMap
 		});
 	},
@@ -220,11 +270,16 @@ viaji = {
 
 	createNamesForCoordinates : function(flightCoordinates) {
 		this.flightPlanNames = Array(flightCoordinates.length);
-		$.each(flightCoordinates, $.proxy(function(i, v) {
-			window.setTimeout($.proxy(function() {
-				this.codeLatLng(v.k, v.A, this.flightPlanNames, i);
-			}, this), 1200);
-		}, this));
+		var count = 0;
+		var timer = setInterval($.proxy(function() {
+			var v = flightCoordinates[count];
+			this.codeLatLng(v.k, v.B, this.flightPlanNames, count);
+			
+			count++;
+			if (count == flightCoordinates.length) {
+				clearInterval(timer);
+			}
+		}, this), 500);
 	},
 
 	codeLatLng : function(lat, lng, namesArray, i) {
@@ -233,34 +288,31 @@ viaji = {
 			'latLng' : latlng
 		}, $.proxy(function(results, status) {
 			if (status == google.maps.GeocoderStatus.OK) {
-				if (results[3]) {
-					namesArray[i] = results[3];
+				if (results[2]) {
+					this.updateNamesInTable(i, results[2].formatted_address);
 				} else {
 					console.log("No results found in reverse geocoding");
 				}
 			} else {
 				console.log("Geocoder failed due to: " + status);
 			}
-			this.nameAnswers++;
-			if (this.nameAnswers == this.flightPlanCoordinates.length) {
-				this.updateNamesInTable();
-			}
 		}, this));
 	},
 
-	updateNamesInTable : function() {
-		console.log(this.flightPlanNames);
+	updateNamesInTable : function(index, text) {
+		$("#exp-" + index).text(text);
 	}
 };
 
 var navigation = {
 	fadeToMap : function() {
+		this.goToByScroll("#route");
 		$("#route").fadeTo("slow", 1);
 	},
 
 	fadeToPlaylist : function() {
-		this.goToByScroll("#playlistdiv");
 		$("#playlistdiv").fadeTo("slow", 1);
+		this.goToByScroll("#playlistdiv");
 	},
 
 	goToByScroll : function(id) {
@@ -268,6 +320,16 @@ var navigation = {
 		$('html,body').animate({
 			scrollTop : $(id).offset().top
 		}, 'slow');
-	}
-};
+	},
 
+	showHideOptions : function() {
+		if ($("#options_btn").text() === "+") {
+			$("#options_div").show("fast");
+			$("#options_btn").text("-");
+		} else {
+			$("#options_div").hide("fast");
+			$("#options_btn").text("+");			
+		}
+	}
+
+};
