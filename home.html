@@ -33,8 +33,8 @@
 			</div>
 			<div class="row">
 				<div class="col-md-4">
-				From A to B in 6 songs.
-				</div> 
+					From A to B in 6 songs.
+				</div>
 			</div>
 			<div class="row">
 				<br />
@@ -61,22 +61,28 @@
 						</div>
 					</div>
 					<div id="options_div" class="row" style="display: none">
-						<p>
-							<input type="radio" name="listen_sort" value="trendy">
-							Trendy,
-							<input type="radio" name="listen_sort" value="familiar">
-							familiar, or
-							<input type="radio" name="listen_sort" value="strange">
-							strange
-							songs.
-						</p>
+						<br/>
+						<div class="btn-group-sm" data-toggle="buttons">
+							<label class="control-label small" for="listen_sort">Prefer songs that are </label>
+							<label class="btn btn-info active">
+								<input type="radio" name="listen_sort" value="trendy" checked>
+								trendy </label>
+							<label class="btn btn-info">
+								<input type="radio" name="listen_sort" value="familiar">
+								familiar </label>
+							<label class="btn btn-info">
+								<input type="radio" name="listen_sort" value="strange">
+								new </label>
+						</div>
 						<script>
-							$("input:radio[name=listen_sort]").click(function() {
+							$('[name="listen_sort"').on("change", function() {
 								var checked_value = $(this).val();
 								viajisearch.setParamSort(checked_value);
+								console.log("set " + checked_value);
 							});
 						</script>
 					</div>
+
 				</div>
 			</div>
 			<div class="row" id="route">
@@ -112,7 +118,8 @@
 					<br />
 					<iframe id="playlist" src="https://embed.spotify.com/?uri=spotify:trackset:Que viaji:" width="400" height="400" frameborder="0" allowtransparency="true"></iframe>
 					<br />
-					<a href="/"><b>start over</b></a><br/>
+					<a href="/"><b>start over</b></a>
+					<br/>
 					<span class="text-muted">check out <a href="#detailsrow">how the playlist was chosen</a>.</span>
 				</div>
 
