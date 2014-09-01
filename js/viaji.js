@@ -263,7 +263,7 @@ viaji = {
 				fillOpacity : 0.5,
 				strokeColor : '#e74c3c',
 				strokeWeight : 2.5,
-				strokeOpacity : .5,
+				strokeOpacity : .75,
 				scale : 4
 			},
 			map : theMap
