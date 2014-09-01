@@ -248,7 +248,7 @@ viaji = {
 			map : theMap,
 			position : thePosition,
 			fillColor : '#ecf0f1',
-			fillOpacity : .25,
+			fillOpacity : .2,
 			strokeColor : '#e74c3c',
 			strokeWeight : .5,
 			strokeOpacity : .3,
@@ -260,7 +260,7 @@ viaji = {
 			icon : {
 				path : google.maps.SymbolPath.CIRCLE,
 				fillColor : '#ecf0f1',
-				fillOpacity : 0.3,
+				fillOpacity : 0.5,
 				strokeColor : '#e74c3c',
 				strokeWeight : 2.5,
 				strokeOpacity : .5,
