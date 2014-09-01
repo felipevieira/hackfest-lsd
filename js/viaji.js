@@ -1,6 +1,6 @@
 viaji = {
 
-	RADIUS_AROUND_POINTS : 2,
+	RADIUS_AROUND_POINTS : 1.75,
 	DEFAULT_TRIP_STOPS : 4,
 	clicks : 0,
 	map : null,
@@ -248,18 +248,24 @@ viaji = {
 			map : theMap,
 			position : thePosition,
 			fillColor : '#ecf0f1',
-			fillOpacity : .6,
+			fillOpacity : .25,
 			strokeColor : '#e74c3c',
-			strokeWeight : 2.5,
-			strokeOpacity : .5,
+			strokeWeight : .5,
+			strokeOpacity : .3,
 			bounds : new google.maps.LatLngBounds(new google.maps.LatLng(thePosition.lat() - this.getRadiusArountPoints(), thePosition.lng() - this.getRadiusArountPoints()), new google.maps.LatLng(thePosition.lat() + this.getRadiusArountPoints(), thePosition.lng() + this.getRadiusArountPoints()))
 		});
 		
 		new google.maps.Marker({
 			position : thePosition,
-			animation : google.maps.Animation.DROP,
-			icon: "http://labs.google.com/ridefinder/images/mm_20_red.png",
-			//draggable : true,
+			icon : {
+				path : google.maps.SymbolPath.CIRCLE,
+				fillColor : '#ecf0f1',
+				fillOpacity : 0.3,
+				strokeColor : '#e74c3c',
+				strokeWeight : 2.5,
+				strokeOpacity : .5,
+				scale : 4
+			},
 			map : theMap
 		});
 	},
