@@ -24,6 +24,10 @@ viaji = {
 		google.maps.event.addListener(this.map, 'click', $.proxy(this.gotMapClick, this));
 	},
 
+	getRadiusArountPoints : function() {
+		return this.RADIUS_AROUND_POINTS;
+	},
+
 	centerMap : function() {
 		var location = "Campina Grande";
 		this.geocoder.geocode({
@@ -40,10 +44,10 @@ viaji = {
 	gotMapClick : function(event) {
 		if (this.clicks == 0) {
 			this.from = event.latLng;
-			this.drawMarker(this.from, this.map);
+			this.drawMarker(this.from, this.map, "A");
 		} else if (this.clicks == 1) {
 			this.to = event.latLng;
-			this.drawMarker(this.to, this.map);
+			this.drawMarker(this.to, this.map, "B");
 		}
 		this.clicks++;
 
@@ -60,15 +64,8 @@ viaji = {
 
 		this.flightPlanCoordinates = this.getPointsInBetween(this.from, this.to, this.DEFAULT_TRIP_STOPS);
 
-		var flightPath = new google.maps.Polyline({
-			path : this.flightPlanCoordinates,
-			geodesic : true,
-			strokeColor : '#FF3300',
-			strokeOpacity : 0.7,
-			strokeWeight : 3
-		});
-
-		flightPath.setMap(this.map);
+		// draw line
+		this.drawFlightPathLine(this.flightPlanCoordinates);
 
 		// draw points
 		var count = 0;
@@ -97,7 +94,7 @@ viaji = {
 
 		for ( count = 0; count < this.flightPlanCoordinates.length; count++) {
 			var point = this.flightPlanCoordinates[count];
-			viajisearch.getTracks(point, this.RADIUS_AROUND_POINTS, travelTheme, $.proxy(function(pointUsed, tracks) {
+			viajisearch.getTracks(point, this.getRadiusArountPoints(), travelTheme, $.proxy(function(pointUsed, tracks) {
 				var track_index = this.flightPlanCoordinates.indexOf(pointUsed);
 				this.playlistCandidates[track_index] = tracks;
 				this.knownAnswers++;
@@ -109,6 +106,29 @@ viaji = {
 				}
 			}, this), $.proxy(failureCallback, this));
 		}
+	},
+
+	drawFlightPathLine : function(coordinates) {
+		var lineSymbol = {
+			path : 'M 0,-1 0,1',
+			strokeOpacity : 0.5,
+			strokeWeight : 3,
+			scale : 4
+		};
+
+		new google.maps.Polyline({
+			path : coordinates,
+			strokeOpacity : 0,
+			geodesic : true,
+			strokeColor : '#FF3300',
+			icons : [{
+				icon : lineSymbol,
+				offset : '0',
+				repeat : '20px'
+			}],
+			map : this.map
+		});
+
 	},
 
 	chooseTracks : function() {
@@ -213,26 +233,33 @@ viaji = {
 		navigation.fadeToPlaylist();
 	},
 
-	drawMarker : function(thePosition, theMap) {
+	drawMarker : function(thePosition, theMap, letter) {
 		new google.maps.Marker({
 			position : thePosition,
 			animation : google.maps.Animation.DROP,
+			icon: "http://maps.google.com/mapfiles/marker" + letter + ".png",
 			//draggable : true,
 			map : theMap
 		});
 	},
 
 	drawPoint : function(thePosition, theMap) {
+		new google.maps.Rectangle({
+			map : theMap,
+			position : thePosition,
+			fillColor : '#ecf0f1',
+			fillOpacity : .6,
+			strokeColor : '#e74c3c',
+			strokeWeight : 2.5,
+			strokeOpacity : .5,
+			bounds : new google.maps.LatLngBounds(new google.maps.LatLng(thePosition.lat() - this.getRadiusArountPoints(), thePosition.lng() - this.getRadiusArountPoints()), new google.maps.LatLng(thePosition.lat() + this.getRadiusArountPoints(), thePosition.lng() + this.getRadiusArountPoints()))
+		});
+		
 		new google.maps.Marker({
 			position : thePosition,
-			icon : {
-				path : google.maps.SymbolPath.CIRCLE,
-				fillColor : '#ecf0f1',
-				fillOpacity : 1,
-				strokeColor : '#e74c3c',
-				strokeWeight : 2.5,
-				scale : 5
-			},
+			animation : google.maps.Animation.DROP,
+			icon: "http://labs.google.com/ridefinder/images/mm_20_red.png",
+			//draggable : true,
 			map : theMap
 		});
 	},
@@ -274,7 +301,7 @@ viaji = {
 		var timer = setInterval($.proxy(function() {
 			var v = flightCoordinates[count];
 			this.codeLatLng(v.k, v.B, this.flightPlanNames, count);
-			
+
 			count++;
 			if (count == flightCoordinates.length) {
 				clearInterval(timer);
@@ -328,8 +355,7 @@ var navigation = {
 			$("#options_btn").text("-");
 		} else {
 			$("#options_div").hide("fast");
-			$("#options_btn").text("+");			
+			$("#options_btn").text("+");
 		}
 	}
-
 };
