@@ -27,7 +27,7 @@ viajisearch = {
 			max_longitude : max_longitude,
 			min_latitude : min_latitude,
 			max_latitude : max_latitude,
-			description : genre,
+			style : genre,
 			results : 100
 		};
 		for (var attrname in this.getTracksExtraParams) {
