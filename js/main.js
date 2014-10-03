@@ -71,7 +71,13 @@ $(document).ready(function () {
         center: new google.maps.LatLng(0, -8),
         zoom: 2,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
-        styles: map_style
+        styles: map_style,
+        panControl: false,
+        zoomControl: false,
+        mapTypeControl: false,
+        scaleControl: false,
+        streetViewControl: false,
+        overviewMapControl: false
     };
 
     viaji.initialize(document.getElementById("map_canvas"), mapOptions);
