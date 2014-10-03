@@ -28,19 +28,6 @@ viaji = {
 		return this.RADIUS_AROUND_POINTS;
 	},
 
-	centerMap : function() {
-		var location = "Campina Grande";
-		this.geocoder.geocode({
-			'address' : location
-		}, function(results, status) {
-			if (status == google.maps.GeocoderStatus.OK) {
-				viaji.map.setCenter(results[0].geometry.location);
-			} else {
-				alert("Could not find location: " + location);
-			}
-		});
-	},
-
 	gotMapClick : function(event) {
 		if (this.clicks == 0) {
 			this.from = event.latLng;
@@ -80,7 +67,7 @@ viaji = {
 		this.currentPlaylist = Array(totalTripStops);
 		this.explanations = Array(totalTripStops);
 		this.knownAnswers = 0;
-		failureCallback = function(jqXHR, textStatus, errorThrown, pointUsed) {
+		var failureCallback = function(jqXHR, textStatus, errorThrown, pointUsed) {
 			console.log(textStatus);
 			this.knownAnswers++;
 			var track_index = this.flightPlanCoordinates.indexOf(pointUsed);

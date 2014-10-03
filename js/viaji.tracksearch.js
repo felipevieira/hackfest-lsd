@@ -1,6 +1,6 @@
 viajisearch = {
 
-	getTracksExtraParams : {
+	tracksExtraParams : {
 		sort : "song_hotttnesss-desc"
 	},
 
@@ -30,11 +30,12 @@ viajisearch = {
 			style : genre,
 			results : 100
 		};
-		for (var attrname in this.getTracksExtraParams) {
-			params[attrname] = this.getTracksExtraParams[attrname];
-		};
+		for (var attrname in this.tracksExtraParams) {
+			params[attrname] = this.tracksExtraParams[attrname];
+		}
 
-		//console.log(request_url);
+		console.log(request_url + $.param(params));
+
 		$.ajax({
 			dataType : "json",
 			url : request_url + $.param(params),
@@ -53,7 +54,7 @@ viajisearch = {
 				//});
 
 				successCallback(point, selected_tracks);
-			}, 
+			},
 			error : function(jqXHR, textStatus, errorThrown){
 				failureCallback(jqXHR, textStatus, errorThrown, point);
 			}
@@ -64,8 +65,10 @@ viajisearch = {
 
 	sortChoicesMap : {
 		"trendy" : "song_hotttnesss-desc",
-		"familiar" : "artist_familiarity-desc",
-		"strange" : "artist_familiarity-asc"
+		"danceable" : "danceability-desc",
+		":)" : "valence-desc",
+		"relaxing" : "energy-asc",
+		"uhuu" : "energy-desc"
 	},
 
 	/**
@@ -73,7 +76,7 @@ viajisearch = {
 	 * @param {Object} sortChoice - One of the following: trendy, familiar, strange
 	 */
 	setParamSort : function (sortChoice) {
-		this.getTracksExtraParams["sort"] = this.sortChoicesMap[sortChoice];
+		this.tracksExtraParams["sort"] = this.sortChoicesMap[sortChoice];
 	}
 
 };
