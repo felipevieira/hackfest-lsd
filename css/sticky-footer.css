@@ -1,0 +1,77 @@
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  overflow:hidden;
+  margin-bottom: 60px;
+  height: 100%;
+  width: 100%;
+}
+
+#map_canvas {
+  height: calc(100% - 60px);
+  width: 100%;
+  z-index: 0;
+}
+
+#menu {
+    position: absolute;
+    left: 100px;
+    z-index: 1;
+}
+
+.info {
+    position: absolute;
+    left: 0px;
+    top: 193px;
+    z-index: 1;
+    background-color: lightgrey;
+    padding: 0px;
+    border: 0px;
+    margin: 0px;
+}
+
+.info_closed {
+    width: 70px;
+    height: 70px;
+}
+
+.info_opened {
+    width: 289px;
+    height:400px;
+}
+
+span.glyphicon {
+    font-size: 2em;
+    position: absolute;
+    top: 22px;
+    left: 22px;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+}
+
+
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+.container {
+  width: auto;
+  max-width: 680px;
+  padding: 0 15px;
+}
+.container .text-muted {
+  margin: 20px 0;
+}

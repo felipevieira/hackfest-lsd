@@ -350,5 +350,19 @@ var navigation = {
 			$("#options_div").hide("fast");
 			$("#options_btn").text("+");
 		}
-	}
+	},
+
+    showInformation : function() {
+        if ($("#info_icon").is(":visible")) {
+            $("#info").removeClass("info_closed")
+            $("#info").addClass("info_opened")
+            $("#info_icon").hide("fast")
+            $("#info_text").show("fast");
+        } else {
+            $("#info_text").hide("fast");
+            $("#info").removeClass("info_opened")
+            $("#info").addClass("info_closed")
+            $("#info_icon").show("fast")
+        }
+    }
 };
